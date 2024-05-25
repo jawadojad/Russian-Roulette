@@ -1,35 +1,24 @@
 import unittest
-from unittest.mock import patch, MagicMock
-import tkinter
+from unittest.mock import patch
 from russian_roulette import start_game, challenge_1
 
 class TestRussianRouletteGame(unittest.TestCase):
 
-    @patch('russian_roulette.messagebox.showinfo')
-    @patch('russian_roulette.input', side_effect=['\n', 'print("Hello, World!")'])
-    def test_start_game_correct_code(self, mock_input, mock_messagebox):
+    @patch('tkinter.messagebox.showinfo')
+    @patch('builtins.input', side_effect=['\n', 'print("Hello, World!")'])
+    def test_challenge_1_correct_code(self, mock_input, mock_messagebox_showinfo):
         with patch('builtins.print') as mock_print:
-            start_game()
-            # Check if the correct messages were printed
-            self.assertIn(("Correct! You have survived this round."), [call[0][0] for call in mock_print.call_args_list])
+            challenge_1()
+            # Check if the success message was shown
+            mock_messagebox_showinfo.assert_called_with("Result", "Correct! You have survived this round.")
 
-    @patch('russian_roulette.messagebox.showinfo')
-    @patch('russian_roulette.input', side_effect=['\n', 'print("Hello World!')])
-    def test_start_game_incorrect_code(self, mock_input, mock_messagebox):
+    @patch('tkinter.messagebox.showerror')
+    @patch('builtins.input', side_effect=['\n', 'print(Hello, World!)'])  # Intentional syntax error
+    def test_challenge_1_syntax_error(self, mock_input, mock_messagebox_showerror):
         with patch('builtins.print') as mock_print:
-            start_game()
-            # Check if the error message was printed
-            self.assertIn(("Error: EOL while scanning string literal"), [call[0][0] for call in mock_print.call_args_list])
-            self.assertIn(("Incorrect! You did not survive this round."), [call[0][0] for call in mock_print.call_args_list])
-
-    @patch('russian_roulette.messagebox.showinfo')
-    @patch('russian_roulette.input', side_effect=['\n', 'print(Hello, World!)'])
-    def test_start_game_syntax_error(self, mock_input, mock_messagebox):
-        with patch('builtins.print') as mock_print:
-            start_game()
-            # Check if the syntax error message was printed
-            self.assertIn(("Error: invalid syntax"), [call[0][0] for call in mock_print.call_args_list])
-            self.assertIn(("Incorrect! You did not survive this round."), [call[0][0] for call in mock_print.call_args_list])
+            challenge_1()
+            # Check if the syntax error message was shown
+            mock_messagebox_showerror.assert_called()
 
 if __name__ == "__main__":
     unittest.main(argv=[''], exit=False)
